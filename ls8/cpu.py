@@ -8,6 +8,14 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         pass
+        # assign the memory allocation - 256 zeros
+        self.ram = [0] * 0xFF * 256
+        # Program Counter >> where calculations/current instructions are executed
+        self.PC = 0
+        # Instruction Register >> where a copy of the current instructions are kept
+        self.IR = None
+        # This register holds value between 0-255 (total of 256) for 8bites/registers
+        self.register = [0] * 8
 
     def load(self):
         """Load a program into memory."""
@@ -63,3 +71,36 @@ class CPU:
     def run(self):
         """Run the CPU."""
         pass
+
+        # Load Immediate - 3 bites
+        LDI = 0b10000010
+        # Instruction Register - 2 bites
+        IR = self.ram[self.PC]	
+        # exit programm - 1 bite     
+        HLT = 0b00000001
+        # print 
+        PRN = 0b01000111
+
+        running_cmd = True
+
+        while running_cmd:
+            # assing the the Instruction Register the memory address read that is stored in Program Counter
+            IR = self.ram[self.PC]
+            # assign first & second operand to ram allocation to perform instructions
+            operand_a = self.ram[self.PC + 1]
+            operand_b = self.ram[self.PC + 2]
+            if IR == LDI:
+                self.register[operand_a] = operand_b
+                self.PC += 3
+            # if Instruction Register = equals Print
+            elif IR == PRN:
+                # prints the numeric value stored in register
+                print(self.register[operand_a])
+                self.PC += 2
+            # if Instruction Register = exit emulator
+            elif IR == HLT:
+                running_cmd = False
+                self.PC += 1
+            else:
+                print(f"Error! Command not found >> {self.ram[self.PC]}")
+                sys.exit(1)
